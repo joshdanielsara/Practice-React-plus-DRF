@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -9,10 +7,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Entry
 from .serializers import *
-
-
 
 @api_view(['POST'])
 def register(request):
@@ -45,27 +44,28 @@ def login_view(request):
     else:
         return Response({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+# Logout view
+# views.py
 
-
-
-
-
-
-
-
-
-
-
+@api_view(['POST'])
+def logout_view(request):
+    if request.method == 'POST':
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
 
-
-
-
 class HelloAPIView(APIView):
+   
+
     def get(self, request, format=None):
         data = {
             'message': 'Hello Everything and Everyone'
@@ -73,8 +73,9 @@ class HelloAPIView(APIView):
         serializer = HelloSerializer(data)
         return Response(serializer.data)
 
-
 class EntryListCreateAPIView(APIView):
+    
+
     def get(self, request, format=None):
         entries = Entry.objects.all()
         serializer = EntrySerializer(entries, many=True)

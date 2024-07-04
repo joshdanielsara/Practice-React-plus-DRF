@@ -1,38 +1,31 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import './styles.css'; // Import the CSS file
 
 function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('/api/login/', { username, password });
       console.log('Login successful:', response.data);
-      // Handle successful login, e.g., store token in localStorage
-
-      // Example of storing token in localStorage
       localStorage.setItem('token', response.data.token);
-
-      // Navigate to another page after successful login
-      navigate('/crudpage'); // Example path to navigate to
+      navigate('/crudpage');
     } catch (error) {
       console.error('Login error:', error);
     }
   };
 
   return (
-    <div>
-      <Link to="/register">
-        <h1>RegisterForm</h1>
-      </Link>
+    <div className='main'>
       
-      <h2>Login</h2>
+      
+      <h2>Login Form</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Username:</label>
@@ -54,6 +47,9 @@ function LoginForm() {
         </div>
         <button type="submit">Login</button>
       </form>
+      <p>Dont have an account?  <Link to="/register">
+        Register
+      </Link> </p> 
     </div>
   );
 }
